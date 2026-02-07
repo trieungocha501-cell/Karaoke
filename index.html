@@ -1,108 +1,87 @@
-!DOCTYPE html
-html lang=vi
-head
-    meta charset=UTF-8
-    meta name=viewport content=width=device-width, initial-scale=1.0
-    titleLYRICA - Virtual Karaoke Stagetitle
-    style
-        root {
-            --primary #bc13fe;
-            --bg #050505;
-        }
-        body { font-family 'Segoe UI', sans-serif; background var(--bg); color #fff; margin 0; padding 0; }
-        
-         Tiêu đề nghệ thuật 
-        h1 {
-            font-size 4rem;
-            text-transform uppercase;
-            letter-spacing 12px;
-            color #fff;
-            text-shadow 0 0 10px var(--primary), 0 0 20px var(--primary);
-            margin 40px 0 10px 0;
-            font-weight 900;
-        }
-        .tagline { color var(--primary); letter-spacing 3px; margin-bottom 30px; font-size 14px; }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LYRICA - Virtual Karaoke Stage</title>
+    <style>
+        :root { --primary: #bc13fe; --bg: #050505; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; margin: 0; text-align: center; }
+        h1 { font-size: 4rem; text-transform: uppercase; letter-spacing: 12px; color: #fff; text-shadow: 0 0 10px var(--primary); margin: 40px 0 10px; }
+        .tagline { color: var(--primary); letter-spacing: 3px; margin-bottom: 30px; font-size: 14px; }
+        #search-box { position: sticky; top: 0; background: rgba(5,5,5,0.9); padding: 20px; z-index: 100; backdrop-filter: blur(10px); }
+        input { padding: 15px; width: 50%; border-radius: 30px; border: 1px solid #333; background: #111; color: #fff; outline: none; }
+        button { padding: 15px 30px; cursor: pointer; background: var(--primary); color: #fff; border: none; border-radius: 30px; font-weight: bold; transition: 0.3s; }
+        #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding: 20px; }
+        .song-card { background: #111; border-radius: 15px; overflow: hidden; cursor: pointer; border: 1px solid #222; }
+        .song-card img { width: 100%; }
+        .song-card p { padding: 10px; font-size: 13px; height: 40px; overflow: hidden; }
+        #player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        #yt-player-container { width: 80%; height: 70%; }
+    </style>
+</head>
+<body>
 
-        .container { max-width 1100px; margin auto; text-align center; }
-        #search-box { position sticky; top 0; background rgba(5,5,5,0.9); padding 20px; z-index 100; backdrop-filter blur(10px); }
-        
-        input { 
-            padding 15px 25px; width 50%; border-radius 30px; border 1px solid #333; 
-            background #111; color #fff; font-size 16px; outline none; transition 0.3s;
-        }
-        inputfocus { border-color var(--primary); box-shadow 0 0 10px rgba(188, 19, 254, 0.3); }
+<div id="search-box">
+    <h1>LYRICA</h1>
+    <div class="tagline">YOUR VOICE, YOUR STAGE</div>
+    <input type="text" id="query" placeholder="Tìm bài hát...">
+    <button onclick="searchMusic()">KHÁM PHÁ</button>
+</div>
 
-        button { 
-            padding 15px 35px; cursor pointer; background var(--primary); color #fff; 
-            border none; border-radius 30px; font-weight bold; margin-left 10px; transition 0.3s;
-        }
-        buttonhover { transform scale(1.05); box-shadow 0 0 15px var(--primary); }
+<div id="results"></div>
+<button id="load-more" style="display:none; margin: 20px auto;" onclick="searchMusic(true)">HIỆN THÊM</button>
 
-         Kết quả tìm kiếm 
-        #results { display grid; grid-template-columns repeat(auto-fill, minmax(220px, 1fr)); gap 25px; margin-top 40px; padding 20px; }
-        .song-card { background #111; border-radius 15px; overflow hidden; cursor pointer; border 1px solid #222; transition 0.3s; }
-        .song-cardhover { border-color var(--primary); transform translateY(-8px); }
-        .song-card img { width 100%; display block; }
-        .song-card p { padding 15px; font-size 13px; margin 0; line-height 1.4; height 36px; overflow hidden; }
+<div id="player-overlay">
+    <h2 id="playing-title" style="color: var(--primary);"></h2>
+    <div id="yt-player-container"></div>
+    <button onclick="closePlayer()" style="margin-top:20px; background:#222;">ĐÓNG</button>
+</div>
 
-         Trình phát Video 
-        #player-overlay { display none; position fixed; top 0; left 0; width 100%; height 100%; background #000; z-index 1000; }
-        .player-content { width 100%; height 100%; display flex; flex-direction column; align-items center; justify-content center; }
-        #yt-player-container { width 80%; height 70%; border 2px solid #222; border-radius 10px; }
-        .close-btn { margin-top 25px; background #222; border 1px solid #444; }
-    style
-head
-body
-
-div class=container
-    div id=search-box
-        h1LYRICAh1
-        div class=taglineYOUR VOICE, YOUR STAGEdiv
-        input type=text id=query placeholder=Tìm bài hát hoặc nghệ sĩ...
-        button onclick=searchMusic()KHÁM PHÁbutton
-    div
-    
-    div id=resultsdiv
-    button id=load-more style=displaynone; margin 40px auto; onclick=searchMusic(true)HIỆN THÊMbutton
-div
-
-div id=player-overlay
-    div class=player-content
-        h2 id=playing-title style=margin-bottom 20px; color var(--primary);h2
-        div id=yt-player-containerdiv
-        button class=close-btn onclick=closePlayer()ĐÓNG TRÌNH PHÁTbutton
-    div
-div
-
-script src=httpswww.youtube.comiframe_apiscript
-
-script
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
     const API_KEY = 'AIzaSyD7Nbtw3hjr0aZsSujG3OnUAddQQNzrJwg';
-    let nextPageToken = '';
-    let currentQuery = '';
-    let player;
+    let nextPageToken = '', currentQuery = '', player;
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-player-container', {
-            height '100%', width '100%', videoId '', 
-            playerVars { 'autoplay' 1, 'rel' 0, 'modestbranding' 1 }
+            height: '100%', width: '100%', videoId: '', 
+            playerVars: { 'autoplay': 1, 'rel': 0 }
         });
     }
 
     async function searchMusic(isMore = false) {
-        const queryInput = document.getElementById('query').value;
-        if (!queryInput) return;
-
+        const q = document.getElementById('query').value;
+        if (!q) return;
         if (!isMore) {
-            currentQuery = queryInput +  karaoke;
+            currentQuery = q + " karaoke";
             document.getElementById('results').innerHTML = '';
             nextPageToken = '';
         }
-
-         Tối ưu maxResults=12 để tiết kiệm quota và giao diện đẹp hơn
-        const url = `httpswww.googleapis.comyoutubev3searchpart=snippet&maxResults=12&q=${encodeURIComponent(currentQuery)}&type=video&videoCategoryId=10&pageToken=${nextPageToken}&key=${API_KEY}`;
-
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(currentQuery)}&type=video&videoCategoryId=10&pageToken=${nextPageToken}&key=${API_KEY}`;
         try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if
+            const res = await fetch(url);
+            const data = await res.json();
+            nextPageToken = data.nextPageToken || '';
+            data.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'song-card';
+                card.onclick = () => {
+                    document.getElementById('playing-title').innerText = item.snippet.title;
+                    document.getElementById('player-overlay').style.display = 'flex';
+                    player.loadVideoById(item.id.videoId);
+                };
+                card.innerHTML = `<img src="${item.snippet.thumbnails.medium.url}"><p>${item.snippet.title}</p>`;
+                document.getElementById('results').appendChild(card);
+            });
+            document.getElementById('load-more').style.display = nextPageToken ? 'block' : 'none';
+        } catch (e) { alert("Hết hạn mức API!"); }
+    }
+
+    function closePlayer() {
+        player.stopVideo();
+        document.getElementById('player-overlay').style.display = 'none';
+    }
+</script>
+</body>
+</html>
