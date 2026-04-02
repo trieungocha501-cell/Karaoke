@@ -7,54 +7,43 @@
     <style>
         :root { --p: #bc13fe; --b: #050505; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--b); color: #fff; margin: 0; text-align: center; }
-        
-        /* Hiệu ứng fadeIn mượt mà cho thẻ bài hát */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         #header { position: sticky; top: 0; background: rgba(5,5,5,0.9); padding: 20px; z-index: 100; backdrop-filter: blur(10px); border-bottom: 1px solid #222; }
         h1 { font-size: clamp(2rem, 8vw, 3rem); text-transform: uppercase; letter-spacing: 10px; text-shadow: 0 0 10px var(--p); margin: 10px 0; font-weight: 900; cursor: pointer; }
         
-        /* Bộ lọc góc phải */
         .filter-box { position: absolute; top: 25px; right: 20px; z-index: 101; }
-        .filter-icon { font-size: 24px; cursor: pointer; color: var(--p); transition: 0.3s; }
+        .filter-icon { font-size: 24px; cursor: pointer; color: var(--p); }
         .filter-menu { 
             display: none; position: absolute; top: 35px; right: 0; 
             background: #1a1a1a; border: 1px solid #333; border-radius: 12px; 
             min-width: 200px; max-height: 300px; overflow-y: auto; 
             box-shadow: 0 5px 20px rgba(0,0,0,0.5); 
         }
-        .filter-menu::-webkit-scrollbar { width: 5px; }
-        .filter-menu::-webkit-scrollbar-thumb { background: var(--p); border-radius: 10px; }
         .filter-menu div { padding: 12px 20px; font-size: 14px; cursor: pointer; text-align: left; border-bottom: 1px solid #252525; }
         .filter-menu div:hover { background: var(--p); color: #fff; }
 
-        /* Khung tìm kiếm tối ưu mobile */
         .search-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 800px; margin: auto; padding: 0 15px; }
-        .search-container { display: flex; align-items: center; background: #111; border-radius: 30px; border: 2px solid #333; padding: 5px 20px; flex-grow: 1; transition: 0.3s; }
-        .search-container:focus-within { border-color: var(--p); }
+        .search-container { display: flex; align-items: center; background: #111; border-radius: 30px; border: 2px solid #333; padding: 5px 20px; flex-grow: 1; }
         input { border: none; background: transparent; color: #fff; padding: 12px; outline: none; flex-grow: 1; font-size: 16px; }
         .mic-btn { cursor: pointer; font-size: 20px; color: var(--p); padding: 5px; }
         .search-btn { padding: 12px 30px; cursor: pointer; background: var(--p); color: #fff; border: none; border-radius: 30px; font-weight: bold; min-height: 48px; }
 
-        .section-label { text-align: left; max-width: 1200px; margin: 25px auto 5px; padding: 0 20px; color: var(--p); font-weight: bold; letter-spacing: 1px; }
+        .section-label { text-align: left; max-width: 1200px; margin: 25px auto 5px; padding: 0 20px; color: var(--p); font-weight: bold; }
 
-        /* Lưới hiển thị bài hát */
         #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: auto; }
         .card { background: #111; border-radius: 15px; overflow: hidden; cursor: pointer; border: 1px solid #222; animation: fadeIn 0.5s ease forwards; transition: 0.3s; }
         .card:hover { border-color: var(--p); transform: translateY(-5px); }
-        .card img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
         .card p { padding: 12px; font-size: 13px; margin: 0; height: 36px; overflow: hidden; line-height: 1.4; text-align: left; }
 
-        /* Trình phát video */
+        #load-more { display: none; margin: 30px auto; background: transparent; color: var(--p); border: 2px solid var(--p); padding: 12px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        #player-container { width: 90%; height: 75%; max-width: 1000px; }
+        #player-container { width: 90%; height: 75%; }
         .close-btn { margin-top: 20px; background: #222; color: #fff; border: 1px solid #444; padding: 12px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; }
 
-        @media (max-width: 600px) { 
-            .search-container { width: 100%; } 
-            .search-btn { width: 100%; } 
-            #results { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 600px) { .search-btn { width: 100%; } #results { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -81,7 +70,7 @@
     <div class="search-wrapper">
         <div class="search-container">
             <span id="mic-icon" class="mic-btn" onclick="startVoice()">🎙️</span>
-            <input type="text" id="q" placeholder="Nói hoặc nhập tên bài hát...">
+            <input type="text" id="q" placeholder="Hát gì hôm nay nhỉ?">
         </div>
         <button class="search-btn" onclick="searchMusic()">TÌM KIẾM</button>
     </div>
@@ -89,6 +78,7 @@
 
 <div class="section-label" id="status-text">ĐANG THỊNH HÀNH</div>
 <div id="results"></div>
+<button id="load-more" onclick="searchMusic(true)">XEM THÊM</button>
 
 <div id="overlay">
     <div id="player-container"></div>
@@ -98,56 +88,49 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
     const KEY = 'AIzaSyD7Nbtw3hjr0aZsSujG3OnUAddQQNzrJwg';
-    let player;
+    let player, nextToken = '', currentQuery = '';
 
     function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player-container', {
-            height: '100%', width: '100%', videoId: '',
-            playerVars: { 'autoplay': 1, 'rel': 0, 'modestbranding': 1 }
+        player = new YT.Player('player-container', { 
+            height: '100%', width: '100%', videoId: '', 
+            playerVars: { 'autoplay': 1, 'rel': 0, 'modestbranding': 1 } 
         });
-        // Mặc định hiện nhạc hot cho lứa tuổi phổ biến nhất
         filterByAge('18-24');
     }
 
     function toggleFilter() {
-        const menu = document.getElementById('filter-menu');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        const m = document.getElementById('filter-menu');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
     }
 
     function filterByAge(range) {
-        const keywords = {
-            '1-3': 'nhạc mầm non karaoke',
-            '4-5': 'nhạc thiếu nhi sôi động karaoke',
-            '6-8': 'nhạc thiếu nhi tiểu học karaoke',
-            '9-12': 'nhạc tuổi thần tiên lớp 5 karaoke',
-            '13-15': 'nhạc tiktok hot karaoke',
-            '16-18': 'nhạc trẻ trending karaoke',
-            '18-24': 'nhạc trẻ hot hiện nay karaoke',
-            '25-30': 'nhạc trẻ ballad buồn karaoke',
-            '31-35': 'nhạc làn sóng xanh karaoke',
-            '35-40': 'nhạc trữ tình hải ngoại karaoke',
-            '41-45': 'nhạc vàng bolero karaoke',
-            '46-50': 'nhạc trữ tình quê hương karaoke'
+        const k = { 
+            '1-3':'nhạc mầm non','4-5':'thiếu nhi sôi động','6-8':'thiếu nhi tiểu học',
+            '9-12':'nhạc trẻ em sôi động năng động','13-15':'nhạc tiktok hot','16-18':'nhạc trẻ trending',
+            '18-24':'nhạc trẻ hot hiện nay','25-30':'ballad buồn','31-35':'làn sóng xanh',
+            '35-40':'trữ tình hải ngoại','41-45':'bolero','46-50':'quê hương' 
         };
-        
-        document.getElementById('q').value = ""; 
-        searchMusic(false, `DÀNH CHO ĐỘ TUỔI ${range}`, keywords[range]);
+        document.getElementById('q').value = "";
+        searchMusic(false, `DÀNH CHO ĐỘ TUỔI ${range}`, k[range] + " karaoke");
         document.getElementById('filter-menu').style.display = 'none';
     }
 
-    async function searchMusic(isMore = false, label = "KẾT QUẢ TÌM KIẾM", autoQ = "") {
-        const query = autoQ || document.getElementById('q').value || "karaoke";
-        document.getElementById('status-text').innerText = label;
-        const resDiv = document.getElementById('results');
-        resDiv.innerHTML = '';
+    async function searchMusic(isMore = false, label = "KẾT QUẢ", autoQ = "") {
+        if (!isMore) {
+            currentQuery = (autoQ || document.getElementById('q').value || "karaoke");
+            if (!currentQuery.includes("karaoke")) currentQuery += " karaoke";
+            document.getElementById('results').innerHTML = '';
+            nextToken = '';
+            document.getElementById('status-text').innerText = label;
+        }
 
-        const finalQ = query.includes("karaoke") ? query : query + " karaoke";
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(finalQ)}&type=video&videoCategoryId=10&key=${KEY}`;
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(currentQuery)}&type=video&videoCategoryId=10&pageToken=${nextToken}&key=${KEY}`;
         
         try {
             const res = await fetch(url);
             const data = await res.json();
             if (data.items) {
+                nextToken = data.nextPageToken || '';
                 data.items.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'card';
@@ -156,31 +139,23 @@
                         player.loadVideoById(item.id.videoId);
                     };
                     card.innerHTML = `<img src="${item.snippet.thumbnails.medium.url}"><p>${item.snippet.title}</p>`;
-                    resDiv.appendChild(card);
+                    document.getElementById('results').appendChild(card);
                 });
+                document.getElementById('load-more').style.display = nextToken ? 'block' : 'none';
             }
-        } catch (e) { console.error("Lỗi API YouTube"); }
+        } catch (e) { console.error("Lỗi"); }
     }
 
     function startVoice() {
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRec) return alert("Trình duyệt không hỗ trợ giọng nói!");
-        const rec = new SpeechRec();
+        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Speech) return alert("Không hỗ trợ");
+        const rec = new Speech();
         rec.lang = 'vi-VN';
         rec.start();
-        rec.onstart = () => { document.getElementById('mic-icon').style.color = 'red'; };
-        rec.onresult = (e) => {
-            document.getElementById('q').value = e.results[0][0].transcript;
-            searchMusic();
-        };
-        rec.onend = () => { document.getElementById('mic-icon').style.color = 'var(--p)'; };
+        rec.onresult = (e) => { document.getElementById('q').value = e.results[0][0].transcript; searchMusic(); };
     }
 
-    function closePlayer() {
-        if (player) player.stopVideo();
-        document.getElementById('overlay').style.display = 'none';
-    }
-
+    function closePlayer() { if(player) player.stopVideo(); document.getElementById('overlay').style.display = 'none'; }
     document.getElementById('q').addEventListener("keypress", (e) => { if(e.key === "Enter") searchMusic(); });
 </script>
 </body>
