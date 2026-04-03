@@ -138,15 +138,7 @@
                         document.getElementById('overlay').style.display = 'flex';
                         player.loadVideoById(item.id.videoId);
                     };
-                    card.innerHTML = `<img src="${item.snippet.thumbnails.medium.url}" onclick="playVideo('${item.id.videoId}')" style="width:100%; cursor:pointer; border-radius: 8px 8px 0 0;">
-<div style="padding:10px; display:flex; justify-content:space-between; align-items:center; position:relative; background:#111; border-radius: 0 0 8px 8px;">
-    <b style="flex:1; font-size:13px; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.snippet.title}</b>
-    <span onclick="toggleActionMenu('${item.id.videoId}')" style="cursor:pointer; color:#bc13fe; font-size:22px; padding-left:10px; line-height:1;">⋮</span>
-    <div id="menu-${item.id.videoId}" class="action-menu" style="display:none; position:absolute; bottom:45px; right:5px; background:#222; border:1px solid #bc13fe; padding:10px; border-radius:8px; z-index:100; min-width:140px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-        <div onclick="addToFav('${item.id.videoId}', '${item.snippet.title.replace(/'/g, "\\'")}', '${item.snippet.thumbnails.medium.url}')" style="cursor:pointer; padding:8px 0; font-size:12px; border-bottom:1px solid #333; color:white;">❤️ Lưu yêu thích</div>
-<div onclick="blockVid('${item.id.videoId}')" style="cursor:pointer; padding:8px 0; font-size:12px; color:#ff4d4d; font-weight:bold;">🚫 Chặn bài này</div>
-    </div>
-</div>`;
+                    card.innerHTML = `<img src="${item.snippet.thumbnails.medium.url}"><p>${item.snippet.title}</p>`;
                     document.getElementById('results').appendChild(card);
                 });
                 document.getElementById('load-more').style.display = nextToken ? 'block' : 'none';
@@ -167,136 +159,7 @@
     }
 
     function closePlayer() { if(player) player.stopVideo(); document.getElementById('overlay').style.display = 'none'; }
-    document.getElementById('q').addEventListener("keypress", (e) => { if(e.key === "Enter") searchMusic(); }
-                                                 
-                                                 
-                                                 // ==========================================
-// 1. QUẢN LÝ DANH SÁCH YÊU THÍCH
-// ==========================================
-function addToFav(id, title, img) {
-    let favs = JSON.parse(localStorage.getItem('lyrica_favs') || '[]');
-    if (!favs.find(f => f.id === id)) {
-        favs.push({ id, title, img });
-        localStorage.setItem('lyrica_favs', JSON.stringify(favs));
-        alert("Đã thêm vào danh sách yêu thích của bạn. ✨");
-    } else {
-        alert("Bài hát này đã có trong danh sách rồi.");
-    }
-}
-
-function showFavorites() {
-    const favs = JSON.parse(localStorage.getItem('lyrica_favs') || '[]');
-    const results = document.getElementById('results');
-    results.innerHTML = '<h2 style="color:#bc13fe; text-align:center; width:100%; margin:20px 0;">🌟 DANH SÁCH YÊU THÍCH</h2>';
-    if (favs.length === 0) { results.innerHTML += '<p style="text-align:center; width:100%;">Danh sách trống.</p>'; return; }
-    
-    favs.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <img src="${item.img}" onclick="playVideo('${item.id}')" style="width:100%; border-radius:8px; cursor:pointer;">
-            <div style="padding:10px; color:white; font-size:12px; text-align:center;"><b>${item.title}</b></div>
-            <button onclick="removeFav('${item.id}')" style="background:#ff4d4d; color:white; border:none; width:90%; padding:8px; margin:5px 5%; border-radius:5px; cursor:pointer;">❌ Bỏ yêu thích</button>
-        `;
-        results.appendChild(card);
-    });
-}
-
-function removeFav(id) {
-    let favs = JSON.parse(localStorage.getItem('lyrica_favs') || '[]');
-    favs = favs.filter(f => f.id !== id);
-    localStorage.setItem('lyrica_favs', JSON.stringify(favs));
-    showFavorites();
-}
-
-// ==========================================
-// 2. QUẢN LÝ DANH SÁCH CHẶN (LÃNH CUNG)
-// ==========================================
-function blockVid(id) {
-    let list = JSON.parse(localStorage.getItem('lyrica_blacklist') || '[]');
-    if(!list.includes(id)) {
-        list.push(id);
-        localStorage.setItem('lyrica_blacklist', JSON.stringify(list));
-        alert("Đã thêm vào danh sách chặn.");
-        location.reload(); 
-    }
-}
-
-function showBlacklist() {
-    const list = JSON.parse(localStorage.getItem('lyrica_blacklist') || '[]');
-    const results = document.getElementById('results');
-    results.innerHTML = '<h2 style="color:#ff4d4d; text-align:center; width:100%; margin:20px 0;">🚫 DANH SÁCH CHẶN</h2>';
-    if (list.length === 0) { results.innerHTML += '<p style="text-align:center; width:100%;">Trống.</p>'; return; }
-    
-    list.forEach(id => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <div style="padding:20px; color:white; text-align:center; background:#222; border-radius:8px; border:1px solid #444;">
-                <p style="font-size:11px; margin-bottom:10px;">ID Video: ${id}</p>
-                <button onclick="unblock('${id}')" style="background:#28a745; color:white; border:none; padding:8px 15px; border-radius:15px; cursor:pointer;">✅ Bỏ chặn</button>
-            </div>
-        `;
-        results.appendChild(card);
-    });
-}
-
-function unblock(id) {
-    let list = JSON.parse(localStorage.getItem('lyrica_blacklist') || '[]');
-    list = list.filter(i => i !== id);
-    localStorage.setItem('lyrica_blacklist', JSON.stringify(list));
-    showBlacklist();
-}
-
-// ==========================================
-// 3. TRẮC NGHIỆM ĐỘ TUỔI TÂM HỒN (KHÔNG LỘ ĐIỂM)
-// ==========================================
-function showFAQ() {
-    let score = 0;
-    alert("Bắt đầu bài trắc nghiệm tâm hồn Lyrica (12 câu hỏi).\nNhập số từ 1 đến 4 để trả lời các lựa chọn.");
-
-    const q = [
-        "1. Thú vui khi rảnh?\n1. Chơi đồ chơi\n2. Xem hoạt hình\n3. Đi trà sữa\n4. Đọc báo/Tin tức",
-        "2. Gu nhạc?\n1. Nhạc thiếu nhi\n2. Nhạc TikTok\n3. Nhạc buồn/Chill\n4. Nhạc xưa",
-        "3. Khi bị mắng?\n1. Khóc nhè\n2. Dỗi\n3. Giải thích\n4. Im lặng suy ngẫm",
-        "4. Đồ ăn yêu thích?\n1. Kẹo/Bánh\n2. Gà rán/Pizza\n3. Cơm gia đình\n4. Đồ bổ dưỡng",
-        "5. Giờ đi ngủ?\n1. 8h tối\n2. 10h tối\n3. 12h đêm\n4. Ngủ sớm giữ sức khỏe",
-        "6. Cách tiêu tiền?\n1. Mua kẹo\n2. Mua thẻ game\n3. Mua quần áo\n4. Tiết kiệm",
-        "7. Phản ứng với trend mới?\n1. Không biết là gì\n2. Làm theo ngay\n3. Xem cho vui\n4. Thấy hơi phiền",
-        "8. Kiểu bạn bè?\n1. Bạn cùng xóm\n2. Bạn cùng lớp\n3. Bạn thân chí cốt\n4. Đối tác/Đồng nghiệp",
-        "9. Nơi muốn đi nhất?\n1. Công viên\n2. Rạp phim\n3. Quán cà phê\n4. Nơi yên tĩnh",
-        "10. Cách dùng điện thoại?\n1. Xem YouTube Kids\n2. Chơi game\n3. Lướt mạng xã hội\n4. Check email/Công việc",
-        "11. Thái độ với tình yêu?\n1. Là cái gì đó lạ lẫm\n2. Thích là nhích\n3. Chân thành, sâu đậm\n4. Cần sự ổn định",
-        "12. Ước mơ?\n1. Làm siêu nhân\n2. Làm idol\n3. Có công việc tốt\n4. Bình yên, hạnh phúc"
-    ];
-
-    for (let i = 0; i < q.length; i++) {
-        let ans = prompt(q[i]);
-        score += (parseInt(ans) || 1);
-    }
-
-    let result = "";
-    if (score <= 12) result = "1 đến 3 tuổi";
-    else if (score <= 15) result = "4 đến 5 tuổi";
-    else if (score <= 18) result = "6 đến 8 tuổi";
-    else if (score <= 22) result = "9 đến 12 tuổi";
-    else if (score <= 26) result = "13 đến 15 tuổi";
-    else if (score <= 30) result = "16 đến 18 tuổi";
-    else if (score <= 34) result = "18 đến 24 tuổi";
-    else if (score <= 38) result = "25 đến 30 tuổi";
-    else if (score <= 41) result = "31 đến 35 tuổi";
-    else if (score <= 44) result = "35 đến 40 tuổi";
-    else if (score <= 46) result = "41 đến 45 tuổi";
-    else result = "46 đến 50 tuổi";
-
-    alert("Kết quả: Độ tuổi tâm hồn của bạn là " + result + ".");
-}
-
-function toggleActionMenu(id) {
-    const menu = document.getElementById('menu-' + id);
-    document.querySelectorAll('.action-menu').forEach(m => { if(m.id !== 'menu-' + id) m.style.display = 'none'; });
-    if(menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-});
+    document.getElementById('q').addEventListener("keypress", (e) => { if(e.key === "Enter") searchMusic(); });
 </script>
 </body>
 </html>
