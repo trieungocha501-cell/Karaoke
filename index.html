@@ -109,6 +109,7 @@
             '9-12':'nhạc trẻ em sôi động năng động','13-15':'nhạc tiktok hot','16-18':'nhạc trẻ trending',
             '18-24':'nhạc trẻ hot hiện nay','25-30':'ballad buồn','31-35':'làn sóng xanh',
             '35-40':'trữ tình hải ngoại','41-45':'bolero','46-50': 'nhạc trữ tình quê hương dân ca'
+        }; // Thêm dấu đóng ngoặc ở đây nè chủ nhân!
         document.getElementById('q').value = "";
         searchMusic(false, `DÀNH CHO ĐỘ TUỔI ${range}`, k[range] + " karaoke");
         document.getElementById('filter-menu').style.display = 'none';
@@ -142,7 +143,7 @@
                 });
                 document.getElementById('load-more').style.display = nextToken ? 'block' : 'none';
             }
-        } catch (e) { console.error("Lỗi"); }
+        } catch (e) { console.error("Lỗi:", e); }
     }
 
     function startVoice() {
@@ -151,7 +152,10 @@
         const rec = new Speech();
         rec.lang = 'vi-VN';
         rec.start();
-        rec.onresult = (e) => { document.getElementById('q').value = e.results[0][0].transcript; searchMusic(); };
+        rec.onresult = (e) => { 
+            document.getElementById('q').value = e.results[0][0].transcript; 
+            searchMusic(); 
+        };
     }
 
     function closePlayer() { if(player) player.stopVideo(); document.getElementById('overlay').style.display = 'none'; }
